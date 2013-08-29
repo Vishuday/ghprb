@@ -47,11 +47,16 @@ public final class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
 	private final Boolean permitAll;
 	private Boolean autoCloseFailedPullRequests;
 
+        private final String includedRegions;
+        private final String excludedRegions;
+        private final String excludedUsers;
+
 	transient private Ghprb ml;
 
 	@DataBoundConstructor
 	public GhprbTrigger(String adminlist, String whitelist, String orgslist, String cron, String triggerPhrase,
-			Boolean onlyTriggerPhrase, Boolean useGitHubHooks, Boolean permitAll, Boolean autoCloseFailedPullRequests) throws ANTLRException{
+                            Boolean onlyTriggerPhrase, Boolean useGitHubHooks, Boolean permitAll, Boolean autoCloseFailedPullRequests,
+                            String includedRegions, String excludedRegions, String excludedUsers) throws ANTLRException{
 		super(cron);
 		this.adminlist = adminlist;
 		this.whitelist = whitelist;
@@ -62,6 +67,9 @@ public final class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
 		this.useGitHubHooks = useGitHubHooks;
 		this.permitAll = permitAll;
 		this.autoCloseFailedPullRequests = autoCloseFailedPullRequests;
+                this.includedRegions = includedRegions;
+                this.excludedRegions = excludedRegions;
+                this.excludedUsers = excludedUsers;
 	}
 
 	@Override
@@ -195,6 +203,31 @@ public final class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
 		}
 	}
 
+        public String excludedRegions() {
+                if (excludedRegions == null) {
+                        return getDescriptor().excludedRegions();
+                } else {
+                        return excludedRegions;
+                }
+        }
+
+        public String includedRegions() {
+                if (includedRegions == null) {
+                        return getDescriptor().includedRegions();
+                } else {
+                        return includedRegions;
+                }
+        }
+
+
+        public String excludedUsers() {
+                if (excludedUsers == null) {
+                        return getDescriptor().excludedUsers();
+                } else {
+                        return excludedUsers;
+                }
+        }
+
 	public static GhprbTrigger getTrigger(AbstractProject p){
 		Trigger trigger = p.getTrigger(GhprbTrigger.class);
 		if(trigger == null || (!(trigger instanceof GhprbTrigger))) return null;
@@ -228,6 +261,9 @@ public final class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
 		private Boolean useComments = false;
 		private String unstableAs = GHCommitState.FAILURE.name();
 		private Boolean autoCloseFailedPullRequests = false;
+                private String includedRegions = "";
+                private String excludedRegions = "";
+                private String excludedUsers = "";
 		private String msgSuccess = "Test PASSed.";
 		private String msgFailure = "Test FAILed.";
 
@@ -271,6 +307,9 @@ public final class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
 			autoCloseFailedPullRequests = formData.getBoolean("autoCloseFailedPullRequests");
 			msgSuccess = formData.getString("msgSuccess");
 			msgFailure = formData.getString("msgFailure");
+                        excludedRegions = formData.getString("excludedRegions");
+                        includedRegions = formData.getString("includedRegions");
+                        excludedUsers = formData.getString("excludedUsers");
 			save();
 			gh = new GhprbGitHub();
 			return super.configure(req,formData);
@@ -343,6 +382,18 @@ public final class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
 		public Boolean getAutoCloseFailedPullRequests() {
 			return autoCloseFailedPullRequests;
 		}
+
+                public String excludedRegions() {
+                        return excludedRegions;
+                }
+
+                public String includedRegions() {
+                        return includedRegions;
+                }
+
+                public String excludedUsers() {
+                        return excludedUsers;
+                }
 
 		public String getServerAPIUrl() {
 			return serverAPIUrl;
