@@ -102,6 +102,10 @@ public class Ghprb {
 		return trigger.getOnlyTriggerPhrase();
 	}
 
+        public boolean isRevExcluded(String sha1) {
+                return trigger.isRevExcluded(String sha1);
+        }
+
 	public boolean isWhitelisted(String username){
 		return trigger.getPermitAll()
 			|| whitelisted.contains(username)

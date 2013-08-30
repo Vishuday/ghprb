@@ -284,6 +284,10 @@ public final class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
                 return users;
         }
 
+        public boolean isRevExcluded(String sha1) {
+                return false;
+        }
+
 	public static GhprbTrigger getTrigger(AbstractProject p){
 		Trigger trigger = p.getTrigger(GhprbTrigger.class);
 		if(trigger == null || (!(trigger instanceof GhprbTrigger))) return null;

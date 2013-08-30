@@ -109,6 +109,9 @@ public class GhprbPullRequest{
                         if (c.getSha1().equals(head)) {
                                 break;
                         }
+                        if (! this.ml.isRevExcluded(c.getSha1())) {
+                                return true;
+                        }
 
                 }
 
