@@ -29,7 +29,7 @@ public class Ghprb {
 	private String                githubServer;
 
 	private boolean checked = false;
-	
+
 	private final Pattern retestPhrasePattern;
 	private final Pattern whitelistPhrasePattern;
 	private final Pattern oktotestPhrasePattern;
@@ -39,7 +39,7 @@ public class Ghprb {
 		whitelistPhrasePattern = Pattern.compile(GhprbTrigger.getDscp().getWhitelistPhrase());
 		oktotestPhrasePattern = Pattern.compile(GhprbTrigger.getDscp().getOkToTestPhrase());
 	}
-	
+
 	public static Builder getBuilder(){
 		return new Builder();
 	}
@@ -103,7 +103,7 @@ public class Ghprb {
 	}
 
         public boolean isRevExcluded(String sha1) {
-                return trigger.isRevExcluded(String sha1);
+                return trigger.isRevExcluded(sha1);
         }
 
 	public boolean isWhitelisted(String username){
