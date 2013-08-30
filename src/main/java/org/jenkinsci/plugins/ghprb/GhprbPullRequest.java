@@ -2,11 +2,13 @@ package org.jenkinsci.plugins.ghprb;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.kohsuke.github.GHCommitState;
 import org.kohsuke.github.GHIssueComment;
 import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHCommit;
 
 /**
  * @author Honza Brázdil <jbrazdil@redhat.com>
@@ -65,7 +67,7 @@ public class GhprbPullRequest{
 		if(target == null) target = pr.getBase().getRef(); // If this instance was created before target was introduced (before v1.8), it can be null.
 		if(authorEmail == null) {
 			// If this instance was create before authorEmail was introduced (before v1.10), it can be null.
-			obtainAuthorEmail(pr); 
+			obtainAuthorEmail(pr);
 		}
 
 		if(isUpdated(pr)){
@@ -99,6 +101,17 @@ public class GhprbPullRequest{
 
 	private boolean isUpdated(GHPullRequest pr){
 		boolean ret = false;
+                String headSha = repo.getPullRequest(id).getHead().getSha();
+                GHCommit commit = repo.getRepository().getCommit(headSha);
+                List<GHCommit> commits = commit.getParents();
+                commits.add(0, commit);
+                for (GHCommit c : commits) {
+                        if (c.getSha1().equals(head)) {
+                                break;
+                        }
+
+                }
+
 		ret = ret || updated.compareTo(pr.getUpdatedAt()) < 0;
 		ret = ret || !pr.getHead().getSha().equals(head);
 
