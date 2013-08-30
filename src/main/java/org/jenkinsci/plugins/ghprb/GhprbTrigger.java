@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -31,6 +33,8 @@ import org.kohsuke.github.GitHub;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+
+import static hudson.Util.fixEmptyAndTrim;
 
 /**
  * @author Honza Brázdil <jbrazdil@redhat.com>
@@ -203,6 +207,21 @@ public final class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
 		}
 	}
 
+        private Pattern[] getRegionsPatterns(String[] regions) {
+                if (regions != null) {
+                        Pattern[] patterns = new Pattern[regions.length];
+                        int i = 0;
+                        for (String region : regions) {
+                                patterns[i++] = Pattern.compile(region);
+                        }
+
+                        return patterns;
+                }
+
+                return new Pattern[0];
+        }
+
+
         public String excludedRegions() {
                 if (excludedRegions == null) {
                         return getDescriptor().excludedRegions();
@@ -210,6 +229,17 @@ public final class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
                         return excludedRegions;
                 }
         }
+
+        public Pattern[] getExcludedRegionsPatterns() {
+                String[] excluded;
+                if (excludedRegions == null || excludedRegions.trim().equals("")) {
+                        excluded = null;
+                } else {
+                        excluded = excludedRegions.split("[\\r\\n]+");
+                }
+                return getRegionsPatterns(excluded);
+        }
+
 
         public String includedRegions() {
                 if (includedRegions == null) {
@@ -220,12 +250,38 @@ public final class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
         }
 
 
+        public Pattern[] getIncludedRegionsPatterns() {
+                String[] included;
+                if (includedRegions == null || includedRegions.trim().equals("")) {
+                        included = null;
+                } else {
+                        included = includedRegions.split("[\\r\\n]+");
+                }
+                return getRegionsPatterns(included);
+        }
+
+
+
+
+
         public String excludedUsers() {
                 if (excludedUsers == null) {
                         return getDescriptor().excludedUsers();
                 } else {
                         return excludedUsers;
                 }
+        }
+
+        public Set<String> getExcludedUsersNormalized() {
+                String s = fixEmptyAndTrim(excludedUsers);
+                if (s == null) {
+                        return Collections.emptySet();
+                }
+                Set<String> users = new HashSet<String>();
+                for (String user : s.split("[\\r\\n]+")) {
+                        users.add(user.trim());
+                }
+                return users;
         }
 
 	public static GhprbTrigger getTrigger(AbstractProject p){
